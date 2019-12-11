@@ -28,12 +28,11 @@ exports.seed = function(knex) {
         .returning("*");
     })
     .then(articleRows => {
-      // console.log(articleRows);
       const articleRef = makeRefObj(articleRows);
-      // console.log(articleRef)
       const formattedComments = formatComments(commentData, articleRef);
-      const datedComments = formatDates(formattedComments);
-      console.log(datedComments);
-      return knex("comments").insert(formattedComments);
+
+      return knex("comments")
+        .insert(formattedComments)
+        .returning("*");
     });
 };

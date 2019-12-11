@@ -1,6 +1,5 @@
 exports.up = function(knex) {
   return knex.schema.createTable("users", userTable => {
-    console.log("creating users..")
     userTable
       .string("username")
       .unique()
@@ -11,6 +10,5 @@ exports.up = function(knex) {
 };
 
 exports.down = function(knex) {
-  console.log("dropping users...")
   return knex.schema.dropTable("users");
 };

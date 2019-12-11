@@ -6,6 +6,12 @@ const {
 } = require("../db/utils/utils");
 
 describe("formatDates", () => {
+  it("does not mutate origional", () => {
+    const input = [{ created_at: 1471522072389 }];
+    formatDates(input);
+    expect(input).to.eql([{ created_at: 1471522072389 }]);
+  });
+
   it("takes empty array and returns empty array", () => {
     const input = [];
     const expected = [];
@@ -72,7 +78,7 @@ describe("formatDates", () => {
   });
 });
 
-describe.only("makeRefObj", () => {
+describe("makeRefObj", () => {
   it("takes array, returns obj", () => {
     const input = [];
     expect(makeRefObj(input)).to.be.an("object");
@@ -81,6 +87,12 @@ describe.only("makeRefObj", () => {
   it("takes array with one object, returns reference obj", () => {
     const input = [{ article_id: 1, title: "A" }];
     expect(makeRefObj(input)).to.eql({ A: 1 });
+  });
+
+  it("does not mutate origional", () => {
+    const input = [{ article_id: 1, title: "A" }];
+    makeRefObj(input);
+    expect(input).to.eql([{ article_id: 1, title: "A" }]);
   });
 
   it("takes array with one object, returns reference obj", () => {
@@ -132,11 +144,11 @@ describe.only("makeRefObj", () => {
 describe("formatComments", () => {
   it("takes array, returns new array", () => {
     const input = [];
-    expect(formatComments(input)).to.be.an("object");
-    expect(formatComments(input)).to.not.eql(input);
+    expect(formatComments(input)).to.be.an("array");
+    expect(formatComments(input)).to.not.equal(input);
   });
 
-  it("takes array of one comment and ref obj, returns comment with id from reference ", () => {
+  xit("takes array of one comment and ref obj, returns comment with id from reference ", () => {
     const input = [
       {
         body: "The ...",
@@ -162,42 +174,54 @@ describe("formatComments", () => {
     const input = [
       {
         body: "The ...",
-        belongs_to: "Living in the shadow of a great man",
+        belongs_to: "A",
         created_by: "butter_bridge",
-        title: "A"
+
+        votes: 16,
+        created_at: 1511354163389
       },
       {
         body: "The ...",
-        belongs_to: "Living in the shadow of a great man",
+        belongs_to: "B",
         created_by: "butter_bridge",
-        title: "B"
+
+        votes: 16,
+        created_at: 1511354163389
       },
       {
         body: "The ...",
-        belongs_to: "Living in the shadow of a great man",
+        belongs_to: "C",
         created_by: "butter_bridge",
-        title: "C"
+
+        votes: 16,
+        created_at: 1511354163389
       }
     ];
     const reference = { A: 1, B: 2, C: 3 };
     const expectedResult = [
       {
         body: "The ...",
-        article_id: "Living in the shadow of a great man",
+
         author: "butter_bridge",
-        article_id: 1
+        article_id: 1,
+        votes: 16,
+        created_at: new Date(1511354163389)
       },
       {
         body: "The ...",
-        article_id: "Living in the shadow of a great man",
+
         author: "butter_bridge",
-        article_id: 2
+        article_id: 2,
+        votes: 16,
+        created_at: new Date(1511354163389)
       },
       {
         body: "The ...",
-        article_id: "Living in the shadow of a great man",
+
         author: "butter_bridge",
-        article_id: 3
+        article_id: 3,
+        votes: 16,
+        created_at: new Date(1511354163389)
       }
     ];
 
