@@ -145,7 +145,7 @@ describe("/api", () => {
     });
   });
 
-  describe.only("/articles/:articleId/comments POST", () => {
+  describe("/articles/:articleId/comments POST", () => {
     it("POST 201 - add a comment by article id", () => {
       return request(app)
         .post("/api/articles/1/comments")
@@ -164,19 +164,248 @@ describe("/api", () => {
         });
     });
 
-    it("POST 201 - add a comment by article id", () => {
+    it("POST 400 - no username on request body", () => {
       return request(app)
         .post("/api/articles/1/comments")
-        .send({ username: "butter_bridge", body: "comment here" })
-        .expect(201)
+        .send({ body: "comment here" })
+        .expect(400)
         .then(({ body }) => {
-          console.log(body);
-          // expect(body.comment.article_id).to.equal(1);
+          expect(body.msg).to.equal("Bad request");
+        });
+    });
+
+    it("POST 404 - username does not exist", () => {
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send({ username: "Not_a_User", body: "comment here" })
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).to.equal("Not Found");
+        });
+    });
+
+    it("POST 404 - param is a non-existant article", () => {
+      return request(app)
+        .post("/api/articles/9999/comments")
+        .send({ username: "butter_bridge", body: "comment here" })
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).to.equal("Not Found");
+        });
+    });
+
+    it("POST 400 - param is non-existant and bad form", () => {
+      return request(app)
+        .post("/api/articles/wrongForm/comments")
+        .send({ username: "butter_bridge", body: "comment here" })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).to.equal("Bad request");
+        });
+    });
+
+    it("POST 400 - request includes a foreign property", () => {
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send({
+          username: "butter_bridge",
+          body: "comment here",
+          colour: "blue"
+        })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).to.equal("Bad Insert Request");
         });
     });
   });
 
-  // describe("/articles/:articleId/comments GET", () => {
-  //   it("POST 200 - gets a comment by article id", () => {});
-  // });
+  describe("GET /articles/:articleId/comments ", () => {
+    it("GET 200 - gets a comment by article ID", () => {
+      return request(app)
+        .get("/api/articles/1/comments")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.comments.length).to.equal(13);
+          expect(body.comments).to.be.an("array");
+          expect(body.comments[0]).to.include.keys([
+            "comment_id",
+            "votes",
+            "created_at",
+            "author",
+            "body"
+          ]);
+        });
+    });
+
+    it("GET 400 bad request", () => {
+      return request(app)
+        .get("/api/articles/notANum/comments")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).to.equal("Bad request");
+        });
+    });
+
+    it("GET 404 non-existant article", () => {
+      return request(app)
+        .get("/api/articles/99999/comments")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).to.equal("Article not found");
+        });
+    });
+
+    it("GET 200 no comments", () => {
+      return request(app)
+        .get("/api/articles/2/comments")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.msg).to.eql("No comments found for article");
+        });
+    });
+
+    it("GET:200, sort author ascending", () => {
+      return request(app)
+        .get("/api/articles/1/comments?sort_by=author&order=asc")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.comments).ascendingBy("author");
+        });
+    });
+
+    it("GET:400, invalid query ", () => {
+      return request(app)
+        .get("/api/articles/5/comments?sort_by=notAColumn")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).to.equal("Bad Insert Request");
+        });
+    });
+  });
+
+  describe("GET /articles", () => {
+    it("GET 200 - gets all articles", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles.length).to.equal(12);
+          expect(body.articles[0]).to.contain.keys(
+            "article_id",
+            "title",
+            "votes",
+            "author",
+            "topic",
+            "created_at",
+            "comment_count"
+          );
+        });
+    });
+
+    it("GET 200 - sorts the articles asc by its default (created_at)", () => {
+      return request(app)
+        .get("/api/articles?order=asc")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles.length).to.equal(12);
+          expect(body.articles).ascendingBy("created_at");
+        });
+    });
+
+    it("GET 200 - sorts the articles by topic, asc", () => {
+      return request(app)
+        .get("/api/articles?sort_by=topic&order=asc")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles.length).to.equal(12);
+          expect(body.articles).ascendingBy("topic");
+        });
+    });
+
+    it("GET:400, bad request for invalid column", () => {
+      return request(app)
+        .get("/api/articles/?sort_by=notAColumn")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).to.equal("Bad Insert Request");
+        });
+    });
+
+    it("GET 200 - filters by author", () => {
+      return request(app)
+        .get("/api/articles?author=rogersop")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles.length).to.equal(3);
+          expect(body.articles[0].author).to.eql("rogersop");
+        });
+    });
+
+    it("GET 200 - filters by topic", () => {
+      return request(app)
+        .get("/api/articles?topic=cats")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles.length).to.equal(1);
+          expect(body.articles[0].topic).to.eql("cats");
+        });
+    });
+
+    it("GET 200 - filters by author and topic", () => {
+      return request(app)
+        .get("/api/articles?author=rogersop&topic=mitch")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles.length).to.equal(2);
+          expect(body.articles[0].author).to.eql("rogersop");
+          expect(body.articles[0].topic).to.eql("mitch");
+        });
+    });
+
+    it("GET 404 - filter by authorNotFound", () => {
+      return request(app)
+        .get("/api/articles?author=nonExistant")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles.length).to.equal(0);
+        });
+    });
+  });
+
+  describe("PATCH /api/comments/:comment_id", () => {
+    it("202 patches comment by changing vote", () => {
+      return request(app)
+        .patch("/api/comments/1")
+        .send({ inc_votes: 10 })
+        .expect(202)
+
+        .then(({ body }) => {
+          expect(body.comment.votes).to.equal(26);
+          expect(body.comment).to.include.keys([
+            "comment_id",
+            "author",
+            "article_id",
+            "created_at",
+            "votes",
+            "body"
+          ]);
+        });
+    });
+
+    it("404 comment not found but valid input", () => {
+      return request(app)
+        .patch("/api/comments/999")
+        .send({ inc_votes: 10 })
+        .expect(404)
+        .then(({ body }) => expect(body.msg).to.equal("Not Found"));
+    });
+  });
+
+  describe("DELETE /api/comments/:comment_id", () => {
+    it("204 deletes comment", () => {
+      return request(app)
+        .delete("/api/comments/1")
+        .expect(204);
+    });
+  });
 });

@@ -25,6 +25,8 @@
   "homepage": "https://github.com/northcoders/be-nc-news#readme",
   "dependencies": {
     "chai": "^4.2.0",
+    "chai-things": "^0.2.0",
+    "each": "^1.2.2",
     "express": "^4.17.1",
     "mocha": "^6.2.2",
     "nodemon": "^1.19.4",

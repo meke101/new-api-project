@@ -2,7 +2,9 @@ const articlesRouter = require("express").Router();
 const {
   getArticle,
   patchArticle,
-  postComment
+  postComment,
+  getComments,
+  getArticles
 } = require("../controllers/articlesController");
 const { methodNotAllowed } = require("../errors/errors");
 console.log(" articles router...");
@@ -16,6 +18,12 @@ articlesRouter
 articlesRouter
   .route("/:article_id/comments")
   .post(postComment)
+  .get(getComments)
+  .all(methodNotAllowed);
+
+articlesRouter
+  .route("/")
+  .get(getArticles)
   .all(methodNotAllowed);
 
 module.exports = { articlesRouter };
