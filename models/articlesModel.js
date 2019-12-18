@@ -70,7 +70,7 @@ const checkArticleExists = id => {
 };
 
 const fetchAllArticles = (sort_by, order, author, topic) => {
-  return connection
+  const articles = connection
     .select(
       "articles.article_id",
       "articles.author",
@@ -91,14 +91,39 @@ const fetchAllArticles = (sort_by, order, author, topic) => {
       if (topic) {
         query.where("articles.topic", "=", topic);
       }
-    })
-}
+    });
+  // .then(articles => articles);
+  // return articles;
+  return Promise.all([articles, checkTopicAuthorExists(author, topic)]).then(
+    promise => {
+      if (promise[0].length === 0 && promise[1].length === 0) {
+        return Promise.reject({ status: 404, msg: "Not found" });
+      } else {
+        return promise[0];
+      }
+    }
+  );
+};
+
+const checkTopicAuthorExists = (author, topic) => {
+  if (topic) {
+    return connection
+      .select("slug")
+      .from("topics")
+      .where("slug", topic);
+  }
+  if (author) {
+    return connection
+      .select("username")
+      .from("users")
+      .where("username", author);
+  }
+};
 
 module.exports = {
   fetchArticle,
   updateArticle,
   insertComment,
   fetchComments,
-  checkArticleExists,
   fetchAllArticles
 };

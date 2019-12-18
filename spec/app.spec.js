@@ -362,12 +362,38 @@ describe("/api", () => {
         });
     });
 
-    it("GET 404 - filter by authorNotFound", () => {
+    it("GET 404 - filter by notAnAuthor", () => {
       return request(app)
-        .get("/api/articles?author=nonExistant")
-        .expect(200)
+        .get("/api/articles?author=notAnAuthor")
+        .expect(404)
         .then(({ body }) => {
-          expect(body.articles.length).to.equal(0);
+          expect(body.msg).to.equal("Not found");
+        });
+    });
+
+    it("GET 404 - filter by notATopic", () => {
+      return request(app)
+        .get("/api/articles?topic=notATopic")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).to.equal("Not found");
+        });
+    });
+    it("GET 404 - method not found", () => {
+      return request(app)
+        .get("/cheese")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).to.equal("Route not found");
+        });
+    });
+
+    it("PATCH 405 - method not allowed", () => {
+      return request(app)
+        .patch("/api/articles")
+        .expect(405)
+        .then(({ body }) => {
+          expect(body.msg).to.equal("Method not allowed");
         });
     });
   });
@@ -398,6 +424,14 @@ describe("/api", () => {
         .send({ inc_votes: 10 })
         .expect(404)
         .then(({ body }) => expect(body.msg).to.equal("Not Found"));
+    });
+  });
+
+  describe("DELETE /api/comments/:comment_id", () => {
+    it("204 deletes comment", () => {
+      return request(app)
+        .delete("/api/comments/1")
+        .expect(204);
     });
   });
 
