@@ -260,7 +260,8 @@ describe("/api", () => {
         .get("/api/articles/2/comments")
         .expect(200)
         .then(({ body }) => {
-          expect(body.msg).to.eql("No comments found for article");
+          console.log(body);
+          expect(body.comments).to.eql([]);
         });
     });
 
@@ -403,7 +404,7 @@ describe("/api", () => {
       return request(app)
         .patch("/api/comments/1")
         .send({ inc_votes: 10 })
-        .expect(202)
+        .expect(200)
 
         .then(({ body }) => {
           expect(body.comment.votes).to.equal(26);
@@ -436,10 +437,10 @@ describe("/api", () => {
   });
 
   describe("DELETE /api/comments/:comment_id", () => {
-    it("204 deletes comment", () => {
+    it("404 comment does not exist", () => {
       return request(app)
-        .delete("/api/comments/1")
-        .expect(204);
+        .delete("/api/comments/10000")
+        .expect(404);
     });
   });
 });

@@ -22,12 +22,11 @@ const removeComment = id => {
     .where("comment_id", id)
     .del()
     .then(result => {
-      result;
-      // if (comments === 0) {
-      //   return Promise.reject({ status: 404, msg: "Comment not found" });
-      // } else {
-      //   return comments;
-      // }
+      if (result === 0) {
+        return Promise.reject({ status: 404, msg: "Comment not found" });
+      } else {
+        return result;
+      }
     });
 };
 module.exports = { updateComment, removeComment };

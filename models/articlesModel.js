@@ -15,7 +15,7 @@ const fetchArticle = id => {
     });
 };
 
-const updateArticle = (id, increment) => {
+const updateArticle = (id, increment = 0) => {
   return connection
     .select("articles.*")
     .from("articles")
@@ -51,10 +51,7 @@ const fetchComments = (sort_by, order, article_id) => {
       if (promise[0].length === 0 && promise[1].length === 0) {
         return Promise.reject({ status: 404, msg: "Article not found" });
       } else if (promise[0].length === 0 && promise[1].length === 1) {
-        return Promise.reject({
-          status: 200,
-          msg: "No comments found for article"
-        });
+        return comments;
       } else {
         return promise[0];
       }
