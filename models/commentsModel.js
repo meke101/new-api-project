@@ -1,6 +1,6 @@
 const connection = require("../db/connection");
 
-const updateComment = (id, increment) => {
+const updateComment = (id, increment = 0) => {
   return connection
     .select("*")
     .from("comments")

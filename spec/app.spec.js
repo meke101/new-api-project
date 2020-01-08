@@ -400,7 +400,7 @@ describe("/api", () => {
   });
 
   describe("PATCH /api/comments/:comment_id", () => {
-    it("202 patches comment by changing vote", () => {
+    it("200 patches comment by changing vote", () => {
       return request(app)
         .patch("/api/comments/1")
         .send({ inc_votes: 10 })
@@ -416,6 +416,28 @@ describe("/api", () => {
             "votes",
             "body"
           ]);
+        });
+    });
+
+    it("200 patches comment by changing vote", () => {
+      return request(app)
+        .patch("/api/comments/1")
+        .send({ inc_votes: 0 })
+        .expect(200)
+
+        .then(({ body }) => {
+          expect(body.comment.votes).to.equal(16);
+        });
+    });
+
+    it("200 patches comment by changing vote", () => {
+      return request(app)
+        .patch("/api/comments/1")
+        .send({})
+        .expect(200)
+
+        .then(({ body }) => {
+          expect(body.comment.votes).to.equal(16);
         });
     });
 
