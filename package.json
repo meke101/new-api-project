@@ -36,10 +36,11 @@
     "nodemon": "^1.19.4",
     "pg": "^7.12.1",
     "sams-chai-sorted": "^1.0.2",
-    "supertest": "^4.0.2"
+    "supertest": "^4.0.2",
+    "knex": "^0.20.7"
   },
   "devDependencies": {
-    "chai-sorted": "^0.2.0",
-    "knex": "^0.20.4"
+    "chai-sorted": "^0.2.0"
+ 
   }
 }
