@@ -6,7 +6,8 @@ const devData = require("./development-data");
 //determines which data set to export (defaulting development)
 const dataSet = {
   development: devData,
-  test: testData
+  test: testData,
+  production: devData
 };
 
 module.exports = dataSet[ENV];

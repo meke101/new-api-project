@@ -4,9 +4,12 @@ const { usersRouter } = require("./usersRouter");
 const { articlesRouter } = require("./articlesRouter");
 const { commentsRouter } = require("./commentsRouter");
 const { methodNotAllowed } = require("../errors/errors");
+const { getAvailableEndpoints } = require("../controllers/apiController");
 
-// console.log("router");
-apiRouter.route("/").all(methodNotAllowed);
+apiRouter
+  .route("/")
+  .get(getAvailableEndpoints)
+  .all(methodNotAllowed);
 apiRouter.use("/topics", topicsRouter);
 apiRouter.use("/users", usersRouter);
 apiRouter.use("/articles", articlesRouter);

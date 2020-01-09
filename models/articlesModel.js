@@ -89,8 +89,7 @@ const fetchAllArticles = (sort_by, order, author, topic) => {
         query.where("articles.topic", "=", topic);
       }
     });
-  // .then(articles => articles);
-  // return articles;
+
   return Promise.all([articles, checkTopicAuthorExists(author, topic)]).then(
     promise => {
       if (promise[0].length === 0 && promise[1].length === 0) {

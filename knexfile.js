@@ -1,3 +1,5 @@
+const { DB_URL } = process.env;
+
 const ENV = process.env.NODE_ENV || "development";
 console.log("knex file....");
 //to point knex towards our mig/seed files
@@ -12,6 +14,10 @@ const baseConfig = {
 };
 
 const customConfig = {
+  production: {
+    connection: `${DB_URL}?ssl=true`
+  },
+
   development: {
     connection: {
       database: "nc_news2",

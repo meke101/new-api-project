@@ -7,7 +7,6 @@ exports.methodNotAllowed = (req, res, next) => {
 };
 
 exports.handleCustomErrors = (err, req, res, next) => {
-  console.log(err.code);
   if (err.status) {
     res.status(err.status).send({ msg: err.msg });
   } else next(err);
